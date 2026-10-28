@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Калькулятор перекупа</title>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;600;800&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#e8ecf2;--panel:#fff;--ink:#141a24;--mute:#667184;--line:#d6dce6;--accent:#2358d6;--accent-ink:#fff;--gain:#14865a;--loss:#cf3550;--field:#f2f5f9;--stripe:#e3e8ef;--grid:#1423400d;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1217;--panel:#171d26;--ink:#eaeef4;--mute:#8793a5;--line:#273040;--accent:#5b92ff;--accent-ink:#08101f;--gain:#3ddc97;--loss:#ff6178;--field:#11161d;--stripe:#1c2430;--grid:#ffffff08;color-scheme:dark}}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;color:var(--ink);font:16px/1.45 Onest,system-ui,"Segoe UI",sans-serif;background:radial-gradient(900px 420px at 90% -80px,color-mix(in srgb,var(--accent) 30%,transparent),transparent 70%),linear-gradient(var(--grid) 1px,transparent 1px) 0 0/32px 32px,linear-gradient(90deg,var(--grid) 1px,transparent 1px) 0 0/32px 32px,var(--bg);background-attachment:fixed}
+body::before{content:"";position:fixed;left:0;right:0;bottom:62px;height:140px;opacity:.11;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='140' viewBox='0 0 420 140'%3E%3Cg fill='%237f8da3'%3E%3Crect x='0' y='60' width='40' height='80'/%3E%3Crect x='46' y='20' width='34' height='120'/%3E%3Crect x='86' y='75' width='50' height='65'/%3E%3Crect x='142' y='40' width='30' height='100'/%3E%3Crect x='178' y='85' width='56' height='55'/%3E%3Crect x='240' y='10' width='36' height='130'/%3E%3Crect x='282' y='55' width='44' height='85'/%3E%3Crect x='332' y='30' width='32' height='110'/%3E%3Crect x='370' y='70' width='50' height='70'/%3E%3C/g%3E%3C/svg%3E") repeat-x bottom/420px 140px}
+.wrap{position:relative;z-index:1;max-width:640px;margin:0 auto;padding:18px 16px 110px}
+h1{font:700 20px/1.2 Unbounded,Onest,sans-serif;margin:6px 0 18px;letter-spacing:-.01em}
+h2{font-size:16px;font-weight:600;margin:0 0 12px}
+.card{background:color-mix(in srgb,var(--panel) 86%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+label{display:block;font-size:13px;color:var(--mute);margin:12px 0 5px}
+input,select{width:100%;padding:12px;border:1px solid var(--line);background:var(--field);color:var(--ink);border-radius:12px;font:16px Onest,sans-serif}
+input[type=number]{font-weight:600}
+input:focus-visible,button:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{padding:13px 16px;border:0;border-radius:12px;background:var(--accent);color:var(--accent-ink);font:600 15px Onest,sans-serif;cursor:pointer;transition:transform .12s}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:transparent;color:var(--mute);border:1px solid var(--line)}
+.btn.small{padding:7px 11px;font-size:13px;border-radius:10px}
+.hero{width:100%;height:190px;border-radius:12px;object-fit:cover;display:flex;align-items:center;justify-content:center;color:var(--mute);font-size:14px;background:repeating-linear-gradient(135deg,var(--field) 0 14px,var(--stripe) 14px 28px);border:1px solid var(--line)}
+.thumb{width:84px;height:60px;border-radius:10px;object-fit:cover;flex:none;display:flex;align-items:center;justify-content:center;color:var(--mute);font-size:11px;text-align:center;background:repeating-linear-gradient(135deg,var(--field) 0 8px,var(--stripe) 8px 16px);border:1px solid var(--line)}
+#carSel{margin-top:10px;font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{position:relative;display:inline-flex;gap:8px;align-items:center;margin:0;padding:9px 13px;border:1px solid var(--line);border-radius:999px;background:var(--field);color:var(--ink);font-size:14px;cursor:pointer;transition:background .15s}
+.chip input{position:absolute;opacity:0;width:1px;height:1px}
+.chip em{font-style:normal;color:var(--mute);font-size:13px}
+.chip:has(input:checked){background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chip:has(input:checked) em{color:inherit;opacity:.8}
+.chip:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+.ticket{position:relative}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.mute{color:var(--mute);font-size:13px}
+.big{font:700 clamp(28px,9vw,40px)/1.1 Unbounded,Onest,sans-serif;margin:8px 0 0;letter-spacing:-.02em;word-break:break-word}
+.pill{padding:6px 12px;border-radius:999px;background:var(--field);border:1px solid var(--line);font-weight:600;font-size:14px;white-space:nowrap}
+.cut{position:relative;border-top:2px dashed var(--line);margin:18px -16px 14px}
+.cut::before,.cut::after{content:"";position:absolute;top:-12px;width:22px;height:22px;border-radius:50%;background:var(--bg)}
+.cut::before{left:-12px}.cut::after{right:-12px}
+.res{display:grid;grid-template-columns:1fr auto;gap:8px 12px;font-size:15px}
+.res b{text-align:right}
+.acts{margin-top:16px;display:flex;gap:8px}
+.acts .btn:first-child{flex:1}
+.gain{color:var(--gain)}.loss{color:var(--loss)}
+.item{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border:0;padding-bottom:0}.item:first-child{padding-top:0}
+.item .grow{flex:1;min-width:0}
+.deal{padding-left:12px;border-left:4px solid var(--gain)}
+.deal.neg{border-left-color:var(--loss)}
+.sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sum div{background:var(--field);border-radius:12px;padding:12px 8px;text-align:center}
+.sum b{display:block;font:700 16px Unbounded,Onest,sans-serif;margin-top:4px;word-break:break-word}
+.empty{color:var(--mute);padding:4px 0}
+nav{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;justify-content:center;gap:6px;padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));background:color-mix(in srgb,var(--panel) 88%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line)}
+nav button{flex:1;max-width:210px;padding:12px 6px;border:0;background:transparent;color:var(--mute);border-radius:12px;font:600 14px Onest,sans-serif;cursor:pointer}
+nav button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+.head{position:relative;overflow:hidden;border-radius:20px;padding:20px 18px 30px;margin:4px 0 16px;color:#fff;background:linear-gradient(135deg,#1a3787,#2358d6 55%,#4b87ff)}
+.head h1{margin:0 0 4px;color:#fff;position:relative}
+.head p{margin:0;font-size:14px;opacity:.85;position:relative}
+.head svg{position:absolute;right:14px;bottom:14px;width:120px;color:#fff;opacity:.34}
+.head::after{content:"";position:absolute;left:0;right:0;bottom:9px;height:3px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.55) 0 18px,transparent 18px 36px);animation:road 1.6s linear infinite}
+@keyframes road{to{background-position:-36px 0}}
+.hstats{display:flex;gap:8px;margin-top:16px;position:relative}
+.hstats div{background:rgba(255,255,255,.16);border-radius:12px;padding:8px 12px}
+.hstats b{display:block;font:700 17px Unbounded,Onest,sans-serif}
+.hstats span{font-size:12px;opacity:.85}
+@media (prefers-reduced-motion:reduce){.head::after{animation:none}}
+body::before{height:190px;opacity:.17;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='190' viewBox='0 0 600 190'%3E%3Cg fill='%238da0bd' fill-opacity='.5'%3E%3Crect x='0' y='95' width='50' height='95'/%3E%3Crect x='56' y='70' width='40' height='120'/%3E%3Crect x='102' y='110' width='60' height='80'/%3E%3Crect x='168' y='80' width='36' height='110'/%3E%3Crect x='210' y='100' width='56' height='90'/%3E%3Crect x='272' y='60' width='44' height='130'/%3E%3Crect x='322' y='105' width='50' height='85'/%3E%3Crect x='378' y='85' width='38' height='105'/%3E%3Crect x='422' y='112' width='64' height='78'/%3E%3Crect x='492' y='72' width='40' height='118'/%3E%3Crect x='538' y='98' width='62' height='92'/%3E%3C/g%3E%3Cg fill='%238da0bd'%3E%3Crect x='20' y='60' width='52' height='130'/%3E%3Crect x='80' y='105' width='40' height='85'/%3E%3Crect x='128' y='40' width='64' height='150'/%3E%3Crect x='158' y='18' width='2' height='22'/%3E%3Crect x='200' y='95' width='50' height='95'/%3E%3Crect x='262' y='55' width='56' height='135'/%3E%3Crect x='326' y='110' width='44' height='80'/%3E%3Crect x='378' y='45' width='66' height='145'/%3E%3Crect x='452' y='90' width='46' height='100'/%3E%3Crect x='506' y='65' width='60' height='125'/%3E%3Crect x='572' y='105' width='28' height='85'/%3E%3C/g%3E%3Cg fill='%23ffd479'%3E%3Crect x='32' y='75' width='5' height='7'/%3E%3Crect x='46' y='75' width='5' height='7'/%3E%3Crect x='32' y='92' width='5' height='7'/%3E%3Crect x='46' y='108' width='5' height='7'/%3E%3Crect x='90' y='120' width='5' height='7'/%3E%3Crect x='104' y='136' width='5' height='7'/%3E%3Crect x='138' y='56' width='5' height='7'/%3E%3Crect x='154' y='56' width='5' height='7'/%3E%3Crect x='170' y='56' width='5' height='7'/%3E%3Crect x='138' y='74' width='5' height='7'/%3E%3Crect x='170' y='92' width='5' height='7'/%3E%3Crect x='154' y='110' width='5' height='7'/%3E%3Crect x='274' y='70' width='5' height='7'/%3E%3Crect x='292' y='70' width='5' height='7'/%3E%3Crect x='274' y='90' width='5' height='7'/%3E%3Crect x='292' y='110' width='5' height='7'/%3E%3Crect x='390' y='60' width='5' height='7'/%3E%3Crect x='408' y='60' width='5' height='7'/%3E%3Crect x='426' y='78' width='5' height='7'/%3E%3Crect x='390' y='96' width='5' height='7'/%3E%3Crect x='518' y='80' width='5' height='7'/%3E%3Crect x='540' y='80' width='5' height='7'/%3E%3Crect x='526' y='100' width='5' height='7'/%3E%3C/g%3E%3C/svg%3E") repeat-x bottom/600px 190px}
+body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:300px;pointer-events:none;background:linear-gradient(to top,color-mix(in srgb,var(--accent) 18%,transparent),transparent)}
+body::before{transform:translateY(calc(var(--sy,0)*.05px))}
+.scene{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.scene i{position:absolute;display:block}
+.stars{inset:0;background:radial-gradient(1.5px 1.5px at 20px 30px,var(--accent),transparent),radial-gradient(1px 1px at 90px 80px,var(--ink),transparent),radial-gradient(1.5px 1.5px at 150px 20px,var(--accent),transparent),radial-gradient(1px 1px at 60px 140px,var(--ink),transparent),radial-gradient(1px 1px at 190px 120px,var(--accent),transparent);background-size:220px 180px;opacity:.45;animation:tw 6s ease-in-out infinite alternate}
+@keyframes tw{to{opacity:.15}}
+.orb{border-radius:50%;filter:blur(40px);background:var(--accent);opacity:.2;animation:fl 20s ease-in-out infinite alternate}
+.o1{width:260px;height:260px;left:-80px;top:22%}
+.o2{width:200px;height:200px;right:-60px;top:48%;animation-duration:26s;animation-delay:-8s;opacity:.16}
+.o3{width:160px;height:160px;left:40%;top:70%;background:#ffb347;opacity:.1;animation-duration:30s}
+@keyframes fl{to{transform:translate(40px,-60px) scale(1.15)}}
+.far{left:0;right:0;bottom:80px;height:280px;opacity:.09;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='200' viewBox='0 0 500 200'%3E%3Cg fill='%238da0bd'%3E%3Crect x='0' y='110' width='46' height='90'/%3E%3Crect x='52' y='70' width='38' height='130'/%3E%3Crect x='96' y='120' width='60' height='80'/%3E%3Crect x='162' y='50' width='34' height='150'/%3E%3Crect x='202' y='100' width='52' height='100'/%3E%3Crect x='260' y='80' width='44' height='120'/%3E%3Crect x='310' y='125' width='56' height='75'/%3E%3Crect x='372' y='60' width='40' height='140'/%3E%3Crect x='418' y='105' width='48' height='95'/%3E%3Crect x='472' y='90' width='28' height='110'/%3E%3C/g%3E%3C/svg%3E") repeat-x bottom/700px 280px;transform:translateY(calc(var(--sy,0)*.025px))}
+.traffic{position:fixed;left:0;right:0;bottom:62px;height:34px;z-index:0;pointer-events:none;overflow:hidden;background:linear-gradient(to top,color-mix(in srgb,var(--ink) 16%,transparent),transparent)}
+.lane{position:absolute;left:0;right:0;height:3px;border-radius:3px;opacity:.8}
+.l1{bottom:8px;background:repeating-linear-gradient(90deg,#fff3c4 0 22px,transparent 22px 210px);filter:drop-shadow(0 0 5px #ffe9a0);animation:ml 7s linear infinite}
+.l2{bottom:19px;background:repeating-linear-gradient(90deg,#ff4d5e 0 16px,transparent 16px 260px);filter:drop-shadow(0 0 5px #ff4d5e);animation:mr 10s linear infinite}
+@keyframes ml{to{background-position:-210px 0}}
+@keyframes mr{from{background-position:-260px 0}to{background-position:0 0}}
+@media (prefers-reduced-motion:reduce){.stars,.orb,.lane{animation:none}}
+#sky{position:absolute;inset:0;width:100%;height:100%}
+.card{box-shadow:0 14px 34px -16px rgba(5,10,25,.45),inset 0 1px 0 rgba(255,255,255,.07);transition:transform .25s}
+@media (hover:hover){.card:hover{transform:translateY(-2px)}}
+.head::before{content:"";position:absolute;top:0;bottom:0;left:-120px;width:70px;background:linear-gradient(100deg,transparent,rgba(255,255,255,.22),transparent);transform:skewX(-18deg);animation:sheen 7s ease-in-out infinite}
+@keyframes sheen{0%,60%{left:-120px}100%{left:110%}}
+.big.gain{text-shadow:0 0 22px color-mix(in srgb,var(--gain) 50%,transparent)}
+body::before{left:-30px;right:-30px;transform:translate(calc(var(--mx,0)*-14px),calc(var(--sy,0)*.05px))}
+.far{left:-30px;right:-30px;transform:translate(calc(var(--mx,0)*-6px),calc(var(--sy,0)*.025px))}
+@media (prefers-reduced-motion:reduce){.head::before{animation:none}}
+.ticket{position:relative;margin-bottom:14px;filter:drop-shadow(0 14px 16px rgba(5,10,25,.3))}
+.tk{position:relative;background:color-mix(in srgb,var(--panel) 92%,transparent);border:1px solid var(--line);padding:16px}
+.tk1{border-radius:16px 16px 0 0;border-bottom:2px dashed var(--line);-webkit-mask:radial-gradient(circle 11px at 0 100%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 11px at 100% 100%,#0000 98%,#000) right/51% 100% no-repeat;mask:radial-gradient(circle 11px at 0 100%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 11px at 100% 100%,#0000 98%,#000) right/51% 100% no-repeat}
+.tk2{border-top:0;border-radius:0 0 16px 16px;-webkit-mask:radial-gradient(circle 11px at 0 0,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 11px at 100% 0,#0000 98%,#000) right/51% 100% no-repeat;mask:radial-gradient(circle 11px at 0 0,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 11px at 100% 0,#0000 98%,#000) right/51% 100% no-repeat}
+.tk1::before,.tk1::after,.tk2::before,.tk2::after{content:"";position:absolute;width:24px;height:24px;box-sizing:border-box;border:1px solid var(--line);border-radius:50%}
+.tk1::before{left:-13px;bottom:-14px;clip-path:inset(0 0 50% 50%)}
+.tk1::after{right:-13px;bottom:-14px;clip-path:inset(0 50% 50% 0)}
+.tk2::before{left:-13px;top:-12px;clip-path:inset(50% 0 0 50%)}
+.tk2::after{right:-13px;top:-12px;clip-path:inset(50% 50% 0 0)}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;background:color-mix(in srgb,#e09a1a 22%,transparent);color:#d18a0c;vertical-align:2px}
+.deal.wait{border-left-color:#e09a1a}
+.close{display:flex;gap:8px;margin-top:8px}.close input{padding:8px 10px;font-size:15px}
+.adv{display:grid;grid-template-columns:1fr auto auto;gap:10px 12px;align-items:center}.adv b{text-align:right;white-space:nowrap}
+.verdict{margin-top:12px;padding:10px 12px;border-radius:12px;background:var(--field);border:1px solid var(--line)}
+.verdict span{font-weight:700}
+.goal{position:relative;margin-top:14px}.gtop{display:flex;justify-content:space-between;gap:10px;font-size:13px;opacity:.92;margin-bottom:6px}
+.bar{height:8px;border-radius:99px;background:rgba(255,255,255,.22);overflow:hidden}.bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#7ef0b6,#fff);transition:width .4s}
+.gdone{margin-top:6px;font-weight:700;font-size:13px}
+.head:has(#goalBox:not([hidden])) > svg{display:none}
+.track{position:relative;height:22px;margin-bottom:3px}
+.gcar{position:absolute;left:0;bottom:0;width:58px;transition:left 1.1s cubic-bezier(.3,.7,.25,1)}
+.head .gcar svg{position:static;display:block;width:100%;opacity:.95}
+.gcar.moving svg{animation:bob .18s ease-in-out 6 alternate}
+@keyframes bob{to{transform:translateY(-1.5px)}}
+.flag{position:absolute;right:0;bottom:1px;font-size:15px;line-height:1}
+.bar i{transition:width 1.1s cubic-bezier(.3,.7,.25,1)}
+@media (prefers-reduced-motion:reduce){.gcar,.bar i{transition:none}.gcar.moving svg{animation:none}}
+.note{margin-top:8px;padding:7px 10px;font-size:14px}
+.mkt{display:flex;gap:8px;margin-top:14px}.mkt input{flex:1;min-width:0}
+.lnk{background:none;border:0;padding:0;color:var(--accent);font:inherit;cursor:pointer;text-decoration:underline}
+.donate{position:absolute;top:14px;right:14px;z-index:2;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.32);color:#fff;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap;transition:background .2s}
+.donate:hover{background:rgba(255,255,255,.3)}
+.donate:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.head h1{padding-right:120px}
+a.btn{display:inline-block;text-decoration:none}
+.neb{inset:-10%;background:radial-gradient(40% 22% at 30% 28%,color-mix(in srgb,var(--accent) 22%,transparent),transparent 70%),radial-gradient(30% 18% at 72% 18%,color-mix(in srgb,#a46bff 16%,transparent),transparent 70%),radial-gradient(45% 20% at 60% 42%,color-mix(in srgb,#2ec5d3 10%,transparent),transparent 70%);filter:blur(30px);transform:rotate(-12deg);animation:neb 40s ease-in-out infinite alternate}
+@keyframes neb{to{transform:rotate(-8deg) scale(1.06) translateX(2%)}}
+.haze{left:0;right:0;bottom:62px;height:240px;background:linear-gradient(to top,color-mix(in srgb,#ffb070 10%,transparent),transparent)}
+.vig{inset:0;opacity:.3;background:radial-gradient(ellipse at 50% 40%,transparent 55%,rgba(0,0,0,.45))}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .vig{opacity:1}}
+@media (prefers-reduced-motion:reduce){.neb{animation:none}}
+.rank{width:28px;height:28px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 13px Unbounded,Onest,sans-serif;background:var(--accent);color:var(--accent-ink)}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="scene" aria-hidden="true"><i class="neb"></i><canvas id="sky"></canvas><i class="orb o1"></i><i class="orb o2"></i><i class="orb o3"></i><i class="far"></i><i class="haze"></i><i class="vig"></i></div>
+<div class="traffic" aria-hidden="true"><i class="lane l1"></i><i class="lane l2"></i></div>
+<div class="wrap">
+<header class="head">
+<svg viewBox="0 0 300 96" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M20 76 C12 76 10 70 11 62 C12 52 16 46 26 44 L64 40 C78 22 100 14 130 12 C160 10 182 12 198 24 L216 38 C246 40 270 44 282 52 C290 57 292 66 290 74 C289 77 286 78 282 78 L250 78 A20 20 0 0 0 210 78 L92 78 A20 20 0 0 0 52 78 Z M74 41 C88 29 106 22 128 21 L144 21 L144 41 Z M150 21 L170 21 C184 22 194 28 203 39 L150 40 Z M276 54 C282 55 286 57 288 61 L279 60 Z"/><path fill="currentColor" fill-rule="evenodd" d="M57 78a15 15 0 1 0 30 0a15 15 0 1 0 -30 0Z M66 78a6 6 0 1 0 12 0a6 6 0 1 0 -12 0Z M215 78a15 15 0 1 0 30 0a15 15 0 1 0 -30 0Z M224 78a6 6 0 1 0 12 0a6 6 0 1 0 -12 0Z"/><circle cx="72" cy="78" r="2.5" fill="currentColor"/><circle cx="230" cy="78" r="2.5" fill="currentColor"/></svg>
+<a class="donate" href="https://donatepay.eu/don/45271" target="_blank" rel="noopener noreferrer">♥ Поддержать</a>
+<h1>Калькулятор перекупа</h1>
+<p>Считай каждую сделку до копейки</p>
+<div class="hstats"><div><b id="hCount">0</b><span>сделок</span></div><div><b id="hProfit">0</b><span>общая прибыль</span></div></div>
+<div class="goal" id="goalBox" hidden></div>
+</header>
+
+<section id="calc">
+<div class="card">
+<div id="heroBox"></div>
+<label class="sr" for="carSel" style="position:absolute;left:-9999px">Машина</label>
+<div class="row" style="margin-top:10px"><input id="cq" placeholder="Найти машину…" aria-label="Поиск машины"><select id="clsF" aria-label="Класс машины"><option value="">Все классы</option><option>Средний</option><option>Премиум</option><option>Грузовой</option><option>Эксклюзив</option></select></div>
+<select id="carSel"></select>
+<div class="mute" id="carInfo" style="margin-top:8px"></div>
+<h2 style="margin-top:18px">Тюнинг на машине</h2>
+<div class="chips" id="tuneList"></div>
+<div class="row" style="margin-top:6px">
+<div><label for="buy">Купил за</label><input id="buy" autocomplete="off" placeholder="например 1.8кк"><div class="mute" id="buyH" style="min-height:18px;margin-top:3px"></div></div>
+<div><label for="sell">Продал за</label><input id="sell" autocomplete="off" placeholder="например 2кк"><div class="mute" id="sellH" style="min-height:18px;margin-top:3px"></div></div>
+</div>
+<div class="row">
+<div><label for="other">Другие расходы</label><input id="other" autocomplete="off" placeholder="0"></div>
+<div><label for="comm">Комиссия при продаже, %</label><input id="comm" type="number" inputmode="decimal" min="0" max="100" step="0.1" placeholder="0"></div>
+</div>
+</div>
+<div class="card" id="adviceCard" hidden><div class="top" style="align-items:center;margin-bottom:12px"><h2 style="margin:0">Подсказка по цене</h2><label class="mute" style="margin:0;display:flex;align-items:center;gap:6px">Хочу заработать <input id="marg" inputmode="decimal" style="width:58px;padding:6px 8px" value="10"> %</label></div><div id="advice"></div><div class="mkt"><input id="mkP" autocomplete="off" placeholder="Видел на рынке за… напр. 2кк" aria-label="Цена с рынка"><button class="btn ghost small" id="mkAdd">Записать</button></div><div class="mute" id="mkInfo" style="margin-top:6px"></div></div>
+<div class="ticket"><div class="tk tk1">
+<div class="top"><div><div class="mute">Чистая прибыль</div><div class="big" id="profit">0</div></div><div class="pill" id="rPct">0%</div></div>
+</div><div class="tk tk2">
+<div class="res">
+<span class="mute">Потрачено на покупку и тюнинг</span><b id="rCost">0</b>
+<span class="mute">Получено после комиссии</span><b id="rNet">0</b>
+<span class="mute">Цена в салоне (ваша покупка к ней)</span><b id="rSalon">—</b>
+</div>
+<input id="dNote" autocomplete="off" placeholder="Заметка к сделке (необязательно)" aria-label="Заметка к сделке" style="margin-top:14px">
+<div class="acts"><button class="btn" id="saveDeal">Сохранить в журнал</button><button class="btn ghost" id="resetForm">Очистить</button></div>
+<div class="mute" id="saveMsg" style="margin-top:10px" role="status"></div>
+</div></div>
+</section>
+
+<section id="log" hidden>
+<div class="card"><div class="sum">
+<div><span class="mute">Продано</span><b id="sCount">0</b></div>
+<div><span class="mute">Прибыль</span><b id="sProfit">0</b></div>
+<div><span class="mute">В процессе</span><b id="sOpen">0</b></div>
+</div><div class="mute" id="sFrozen" style="margin-top:10px;text-align:center"></div></div>
+<div class="card"><h2>Прибыль по сделкам</h2><div id="chart"></div></div>
+<div class="card"><h2>Топ-3 сделки</h2><div id="top3"></div></div>
+<div class="card">
+<div class="row"><div><label for="q" style="margin-top:0">Поиск по машине</label><input id="q" placeholder="Название"></div>
+<div><label for="flt" style="margin-top:0">Показать</label><select id="flt"><option value="all">Все</option><option value="open">В процессе</option><option value="gain">Прибыльные</option><option value="loss">Убыточные</option></select></div></div>
+<div id="logList" style="margin-top:14px"></div></div>
+</section>
+
+<section id="base" hidden>
+<div class="card"><h2>База Radmir</h2><p class="mute" style="margin:0 0 12px">Автосалоны среднего и премиум класса, грузовики и эксклюзивные машины. Уже добавленные машины не задвоятся, у них просто обновятся данные.</p><button class="btn" id="presetBtn">Загрузить базу Radmir</button>
+<h2 style="margin-top:18px">Свои фото</h2><p class="mute" style="margin:0 0 12px">Фото всех машин Radmir уже встроены, загружать их не нужно. Если хотите заменить какие-то своими, выберите картинки: они привяжутся к машинам по названию файла или ID.</p><button class="btn ghost" id="bulkBtn">Выбрать фото</button><input type="file" id="bulkFile" accept="image/*" multiple hidden>
+<div class="mute" id="presetMsg" role="status" style="margin-top:10px"></div></div>
+<div class="card">
+<h2>Добавить машину</h2>
+<label for="newCar" style="margin-top:0">Название</label><input id="newCar" placeholder="Например, Lada Vesta">
+<label for="newPhoto">Фото (по желанию)</label><input id="newPhoto" type="file" accept="image/*">
+<div style="margin-top:14px"><button class="btn" id="addCar">Добавить машину</button></div>
+</div>
+<div class="card"><h2>Мои машины</h2><div id="carList"></div></div>
+<div class="card">
+<h2>Добавить тюнинг</h2>
+<div class="row">
+<div><label for="newTune" style="margin-top:0">Название</label><input id="newTune" placeholder="Например, Турбо"></div>
+<div><label for="newTuneCost" style="margin-top:0">Стоимость</label><input id="newTuneCost" type="number" inputmode="decimal" min="0" placeholder="0"></div>
+</div>
+<div style="margin-top:14px"><button class="btn" id="addTune">Добавить тюнинг</button></div>
+</div>
+<div class="card"><h2>Мой тюнинг</h2><div id="tuneBase"></div></div>
+<div class="card"><h2>Цель заработка</h2><div class="row"><div><label for="goalA" style="margin-top:0">Сумма</label><input id="goalA" autocomplete="off" placeholder="например 10кк"></div><div><label for="goalP" style="margin-top:0">За период</label><select id="goalP"><option value="day">День</option><option value="week">Неделю</option></select></div></div><div class="mute" style="margin-top:8px">Прогресс показывается в шапке. Оставьте сумму пустой, чтобы убрать цель.</div></div>
+<div class="card"><h2>Резервная копия</h2><p class="mute" style="margin:0 0 10px">Сделайте копию, чтобы не потерять машины, тюнинг и журнал. Сохраните текст в заметки или файл, а потом вставьте его сюда, чтобы всё восстановить.</p>
+<div class="acts" style="margin-top:0;flex-wrap:wrap"><button class="btn" id="expBtn">Сделать копию</button><button class="btn ghost" id="impFileBtn">Загрузить из файла</button><input type="file" id="impFile" accept=".json,.txt,application/json,text/plain" hidden></div>
+<textarea id="bk" rows="5" placeholder="Здесь появится копия, или вставьте сюда свою" aria-label="Текст резервной копии" style="width:100%;margin-top:12px;padding:12px;border:1px solid var(--line);background:var(--field);color:var(--ink);border-radius:12px;font:13px/1.4 ui-monospace,monospace;resize:vertical"></textarea>
+<div class="acts"><button class="btn ghost" id="copyBtn">Скопировать</button><button class="btn ghost" id="impBtn">Восстановить из текста</button></div>
+<div class="mute" id="bkMsg" role="status" style="margin-top:8px"></div></div>
+<div class="card"><h2>Поддержать автора</h2><p class="mute" style="margin:0 0 12px">Калькулятор бесплатный. Если он помог заработать, можно поддержать автора.</p><div id="donLinks" style="display:flex;flex-wrap:wrap;gap:8px"><a class="btn" href="https://donatepay.eu/don/45271" target="_blank" rel="noopener noreferrer">Через DonatePay</a></div></div>
+<div class="card"><button class="btn ghost" id="wipe">Стереть все данные</button></div>
+</section>
+</div>
+
+<nav role="tablist">
+<button role="tab" data-tab="calc" aria-selected="true">Сделка</button>
+<button role="tab" data-tab="log" aria-selected="false">Журнал</button>
+<button role="tab" data-tab="base" aria-selected="false">База</button>
+</nav>
+
+<script>
+var KEY='flipcalc1';
+var S={cars:[],tunes:[],deals:[],comm:0};
+var IDB=null,phCache={};
+function load(){try{var r=localStorage.getItem(KEY);if(r){var d=JSON.parse(r);if(d&&typeof d==='object')S=Object.assign(S,d)}}catch(e){}[S.cars,S.deals].forEach(function(a){a.forEach(function(x){if(x.photo==='@idb')x.photo=''})})}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S,function(k,v){return IDB&&k==='photo'&&typeof v==='string'&&v.length>200?'@idb':v}));syncPhotos();return true}catch(e){return false}}
+function syncPhotos(){if(!IDB)return;try{var st=IDB.transaction('ph','readwrite').objectStore('ph'),seen={},put=function(k,v){seen[k]=1;if(v&&v.length>200&&phCache[k]!==v){st.put(v,k);phCache[k]=v}};S.cars.forEach(function(c){put('c:'+c.id,c.photo)});S.deals.forEach(function(d){put('d:'+d.id,d.photo)});Object.keys(phCache).forEach(function(k){if(!seen[k]){st.delete(k);delete phCache[k]}})}catch(e){}}
+function openPhotos(){try{var rq=indexedDB.open('flipcalc',1);rq.onupgradeneeded=function(){rq.result.createObjectStore('ph')};rq.onsuccess=function(){var db=rq.result,cr=db.transaction('ph').objectStore('ph').openCursor();cr.onsuccess=function(){var c=cr.result;if(c){phCache[c.key]=c.value;c.continue();return}IDB=db;S.cars.forEach(function(x){if(!x.photo&&phCache['c:'+x.id])x.photo=phCache['c:'+x.id]});S.deals.forEach(function(x){if(!x.photo&&phCache['d:'+x.id])x.photo=phCache['d:'+x.id]});save();renderCars();renderLog()}}}catch(e){}}
+function $(id){return document.getElementById(id)}
+function num(v){if(typeof v==='number')return isFinite(v)?v:0;var s=String(v==null?'':v).toLowerCase().replace(/\s/g,'').replace(/,/g,'.'),mul=1,m;if(/млрд$/.test(s)){mul=1e9;s=s.replace(/млрд$/,'')}else if(/млн$/.test(s)){mul=1e6;s=s.replace(/млн$/,'')}else if((m=s.match(/[кk]+$/))){mul=Math.pow(1000,m[0].length);s=s.slice(0,-m[0].length)}else if(/^\d+(\.\d{3})+$/.test(s)){s=s.replace(/\./g,'')}var n=parseFloat(s);return isFinite(n)?n*mul:0}
+function med(a){if(!a.length)return 0;var s=a.slice().sort(function(x,y){return x-y}),h=s.length>>1;return s.length%2?s[h]:(s[h-1]+s[h])/2}
+function qnt(a,p){var s=a.slice().sort(function(x,y){return x-y});return s[Math.floor(p*(s.length-1))]}
+function renderAdvice(){var c=curCar(),box=$('advice');$('adviceCard').hidden=!c;if(!c)return;
+ var k=1-num($('comm').value)/100,extra=tuneSum()+num($('other').value),mg=(num($('marg').value)||0)/100,buy=num($('buy').value);
+ var hist=S.deals.filter(function(x){return x.cid===c.id||x.car===c.name}),sold=hist.filter(function(x){return !x.open}),buys=hist.map(function(x){return x.buy}).filter(Boolean),sells=sold.map(function(x){return x.sell}).filter(Boolean),est=0,good=0,src='',now=Date.now(),allMk=(S.market||[]).filter(function(r){return r.cid===c.id||r.car===c.name}),mk=allMk.filter(function(r){return now-r.ts<12096e5}).map(function(r){return r.price}),pool=sells.concat(mk);
+ var lm=allMk[allMk.length-1];$('mkInfo').innerHTML=allMk.length?'С рынка записано: '+allMk.length+', последняя '+fmt(lm.price)+' ('+new Date(lm.ts).toLocaleDateString('ru-RU')+') · <button class="lnk" data-mkclear="'+c.id+'">очистить</button>':'Записывайте цены из объявлений на рынке, и подсказка станет точнее.';
+ if(pool.length){est=med(pool);good=buys.length?qnt(buys,.25):0;src=[sells.length?'по вашим продажам ('+sells.length+')':'',mk.length?'по ценам с рынка за 2 недели ('+mk.length+')':''].join(sells.length&&mk.length?' и ':'')}
+ else if(c.price){var rs=[],rb=[];S.deals.forEach(function(x){var p=x.salon||((S.cars.find(function(z){return z.name===x.car})||{}).price);if(!p)return;if(x.buy)rb.push(x.buy/p);if(!x.open&&x.sell)rs.push(x.sell/p)});if(rs.length>=2){est=c.price*med(rs);good=rb.length?c.price*qnt(rb,.25):0;src='по другим вашим сделкам, относительно цены салона. Это примерная оценка'}}
+ if(!est){box.innerHTML='<div class="empty">Пока мало данных. Запишите цену этой машины с рынка ниже или продайте пару машин с ценой салона, и здесь появятся рекомендуемые цены.</div>';return}
+ var maxBuy=Math.max(0,est*k/(1+mg)-extra);good=good?Math.min(good,maxBuy):maxBuy;
+ var rng=pool.length>1?' <span class="mute">('+fmt(Math.min.apply(null,pool))+' – '+fmt(Math.max.apply(null,pool))+')</span>':'';
+ var h='<div class="adv"><span>Обычно продаётся за'+rng+'</span><b>~'+fmt(est)+'</b><button class="btn ghost small" data-fillsell="'+Math.round(est)+'">Подставить</button>'+'<span>Брать не дороже <span class="mute">(чтобы заработать '+Math.round(mg*100)+'%)</span></span><b>'+fmt(maxBuy)+'</b><button class="btn ghost small" data-fillbuy="'+Math.round(maxBuy)+'">Подставить</button>'+'<span>Хорошая цена покупки</span><b class="gain">'+fmt(good)+'</b><button class="btn ghost small" data-fillbuy="'+Math.round(good)+'">Подставить</button></div>';
+ if(buy){var exp=est*k-(buy+extra),ok=buy<=good?2:buy<=maxBuy?1:0;h+='<div class="verdict"><span class="'+(ok===2?'gain':ok?'':'loss')+'">'+(ok===2?'Отличная цена':ok?'Нормальная цена':'Дороговато')+'</span>: при обычной продаже прибыль ≈ '+(exp>0?'+':'')+fmt(exp)+'</div>'}
+ box.innerHTML=h+'<div class="mute" style="margin-top:10px">Рассчитано '+src+'. Чем больше сделок, тем точнее.</div>'}
+function fmt(n){return Math.round(n).toLocaleString('ru-RU')}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
+
+var checked={};
+function tab(name){
+ ['calc','log','base'].forEach(function(t){$(t).hidden=t!==name});
+ document.querySelectorAll('nav button').forEach(function(b){b.setAttribute('aria-selected',b.dataset.tab===name)});
+ if(name==='log')renderLog();
+ window.scrollTo(0,0);
+}
+document.querySelectorAll('nav button').forEach(function(b){b.onclick=function(){tab(b.dataset.tab)}});
+
+// Своё фото важнее встроенного. Встроенные лежат в photos/<ID машины>.webp; для сделки ищем её машину.
+function pic(x){if(!x)return '';if(x.photo)return x.photo;var c=x.rid?x:S.cars.find(function(z){return z.id===x.cid})||S.cars.find(function(z){return z.name===x.car});return c&&c.rid?'photos/'+c.rid+'.webp':''}
+function miss(cls,txt){return '<div class="'+cls+'">'+txt+'</div>'}
+function onMiss(cls,txt){return ' onerror="this.outerHTML=\''+miss(cls,txt).replace(/"/g,'&quot;')+'\'"'}
+function thumb(c){var p=pic(c);return p?'<img class="thumb" alt="" loading="lazy" src="'+p+'"'+onMiss('thumb','нет фото')+'>':miss('thumb','нет фото')}
+function curCar(){return S.cars.find(function(c){return c.id===$('carSel').value})}
+
+function renderHero(){var c=curCar(),ci=$('carInfo');ci.textContent=c?[c.cls,c.src,c.price?'Салон: '+fmt(c.price):'',c.drive?c.drive+' привод':'',c.speed?c.speed+' км/ч':'',c.rid?'ID '+c.rid:''].filter(Boolean).join(' · '):'';calc();var p=pic(c);$('heroBox').innerHTML=p?'<img class="hero" alt="'+esc(c.name)+'" src="'+p+'"'+onMiss('hero','У этой машины нет фото')+'>':miss('hero',c?'У этой машины нет фото':'Добавьте первую машину во вкладке «База»')}
+function renderCars(){
+ var sel=$('carSel'),prev=sel.value,cq=($('cq').value||'').trim().toLowerCase(),fc=S.cars.filter(function(c){var cf=$('clsF').value;return (!cf||c.cls===cf)&&(!cq||(c.name+' '+(c.rid||'')+' '+(c.src||'')).toLowerCase().indexOf(cq)>=0)});
+ sel.innerHTML=fc.length?fc.map(function(c){return '<option value="'+c.id+'">'+esc(c.name)+(c.price?' — '+fmt(c.price):'')+'</option>'}).join(''):'<option value="">'+(S.cars.length?'Не найдено':'Машин пока нет')+'</option>';
+ if(prev&&fc.some(function(c){return c.id===prev}))sel.value=prev;
+ renderHero();
+ $('carList').innerHTML=S.cars.length?S.cars.map(function(c){return '<div class="item">'+thumb(c)+'<div class="grow">'+esc(c.name)+'</div><button class="btn ghost small" data-delcar="'+c.id+'">Удалить</button></div>'}).join(''):'<div class="empty">Машин пока нет. Добавьте первую выше.</div>';
+}
+function renderTunes(){
+ $('tuneList').innerHTML=S.tunes.length?S.tunes.map(function(t){return '<label class="chip"><input type="checkbox" data-t="'+t.id+'"'+(checked[t.id]?' checked':'')+'><span>'+esc(t.name)+'</span><em>'+fmt(t.cost)+'</em></label>'}).join(''):'<div class="empty">Тюнинга пока нет. Добавьте его во вкладке «База».</div>';
+ $('tuneBase').innerHTML=S.tunes.length?S.tunes.map(function(t){return '<div class="item"><div class="grow">'+esc(t.name)+'</div><input style="width:110px" type="number" inputmode="decimal" min="0" value="'+t.cost+'" data-cost="'+t.id+'" aria-label="Стоимость: '+esc(t.name)+'"><button class="btn ghost small" data-deltune="'+t.id+'">Удалить</button></div>'}).join(''):'<div class="empty">Список пуст.</div>';
+}
+function tuneSum(){return S.tunes.reduce(function(s,t){return s+(checked[t.id]?t.cost:0)},0)}
+function calc(){
+ var buy=num($('buy').value),sell=num($('sell').value),other=num($('other').value),comm=num($('comm').value);
+ var cost=buy+tuneSum()+other,net=sell*(1-comm/100),p=net-cost;
+ var el=$('profit');el.textContent=(p>0?'+':'')+fmt(p);el.className='big '+(p>0?'gain':p<0?'loss':'');
+ $('rCost').textContent=fmt(cost);$('rNet').textContent=fmt(net);
+ $('rPct').textContent=(cost>0?(p/cost*100).toFixed(1):'0')+'%';
+ var cc=curCar();$('rSalon').textContent=cc&&cc.price?fmt(cc.price)+(buy?' ('+(buy<=cc.price?'−':'+')+Math.abs((buy/cc.price-1)*100).toFixed(0)+'%)':''):'—';
+ $('buyH').textContent=buy?fmt(buy):'';$('sellH').textContent=sell?fmt(sell):'';renderAdvice();
+ return {cost:cost,net:net,profit:p,buy:buy,sell:sell,other:other,comm:comm};
+}
+function renderLog(){
+ var sold=S.deals.filter(function(x){return !x.open}),open=S.deals.filter(function(x){return x.open});
+ var tot=sold.reduce(function(s,x){return s+x.profit},0),frozen=open.reduce(function(s,x){return s+(x.cost||x.buy)},0);
+ $('sCount').textContent=sold.length;$('sProfit').textContent=fmt(tot);$('sOpen').textContent=open.length;
+ var tm=sold.filter(function(x){return x.t0&&x.t1}).map(function(x){return (x.t1-x.t0)/864e5}),avg=tm.length?tm.reduce(function(s,v){return s+v},0)/tm.length:0;
+ $('sFrozen').textContent=[open.length?'Вложено в непроданные машины: '+fmt(frozen):'',tm.length?'Средний срок продажи: '+(avg<1?'меньше дня':avg.toFixed(1)+' дн.'):''].filter(Boolean).join(' · ');
+ $('hCount').textContent=sold.length;$('hProfit').textContent=(tot>0?'+':'')+fmt(tot);renderGoal();
+ if(sold.length<2){$('chart').innerHTML='<div class="empty">График появится после двух проданных машин.</div>'}else{
+  var acc=0,pts=sold.map(function(x){acc+=x.profit;return acc}),mn=Math.min(0,Math.min.apply(null,pts)),mx=Math.max(0,Math.max.apply(null,pts)),rg=mx-mn||1,Wc=600,Hc=180,px=function(i){return 10+i*(Wc-20)/(pts.length-1)},py=function(v){return 10+(mx-v)*(Hc-20)/rg};
+  var line=pts.map(function(v,i){return (i?'L':'M')+px(i).toFixed(1)+' '+py(v).toFixed(1)}).join(' '),area=line+' L'+px(pts.length-1).toFixed(1)+' '+py(0).toFixed(1)+' L'+px(0).toFixed(1)+' '+py(0).toFixed(1)+' Z';
+  $('chart').innerHTML='<svg viewBox="0 0 '+Wc+' '+Hc+'" style="width:100%;height:auto;display:block" role="img" aria-label="Накопленная прибыль: '+fmt(acc)+'"><defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--accent);stop-opacity:.35"/><stop offset="1" style="stop-color:var(--accent);stop-opacity:0"/></linearGradient></defs><line x1="10" x2="'+(Wc-10)+'" y1="'+py(0)+'" y2="'+py(0)+'" style="stroke:var(--line)" stroke-dasharray="4 4"/><path d="'+area+'" fill="url(#cg)"/><path d="'+line+'" style="fill:none;stroke:var(--accent)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><circle cx="'+px(pts.length-1)+'" cy="'+py(acc)+'" r="5" style="fill:var(--accent)"/></svg><div class="mute" style="display:flex;justify-content:space-between;margin-top:6px"><span>Первая сделка</span><span>Итого '+(acc>0?'+':'')+fmt(acc)+'</span></div>'}
+ var top=sold.slice().sort(function(a,b){return b.profit-a.profit}).slice(0,3);
+ $('top3').innerHTML=top.length?top.map(function(x,i){return '<div class="item"><div class="rank">'+(i+1)+'</div>'+thumb(x)+'<div class="grow"><b>'+esc(x.car)+'</b><div class="mute">'+esc(x.date)+'</div></div><b class="'+(x.profit>=0?'gain':'loss')+'">'+(x.profit>0?'+':'')+fmt(x.profit)+'</b></div>'}).join(''):'<div class="empty">Пока нет проданных машин.</div>';
+ var q=$('q').value.trim().toLowerCase(),fl=$('flt').value;
+ var list=S.deals.filter(function(x){if(q&&(x.car+' '+(x.note||'')).toLowerCase().indexOf(q)<0)return false;if(fl==='open')return x.open;if(fl==='gain')return !x.open&&x.profit>=0;if(fl==='loss')return !x.open&&x.profit<0;return true}).reverse();
+ $('logList').innerHTML=list.length?list.map(function(x){
+  if(x.open)return '<div class="item">'+thumb(x)+'<div class="grow deal wait"><b>'+esc(x.car)+'</b> <span class="badge">в процессе</span><div class="mute">'+esc(x.date)+(x.tunes?' · '+esc(x.tunes):'')+'</div><div class="mute">Вложено '+fmt(x.cost||x.buy)+held(x)+'</div>'+noteIn(x)+'<div class="close"><input autocomplete="off" placeholder="Продал за, напр. 2кк" data-sellfor="'+x.id+'" aria-label="Цена продажи: '+esc(x.car)+'"><button class="btn small" data-closedeal="'+x.id+'">Продал</button></div></div><button class="btn ghost small" data-deldeal="'+x.id+'">Удалить</button></div>';
+  return '<div class="item">'+thumb(x)+'<div class="grow deal'+(x.profit<0?' neg':'')+'"><b>'+esc(x.car)+'</b><div class="mute">'+esc(x.date)+(x.tunes?' · '+esc(x.tunes):'')+'</div><div class="mute">Куплено '+fmt(x.buy)+', продано '+fmt(x.sell)+held(x)+'</div>'+noteIn(x)+'</div><div style="text-align:right"><b class="'+(x.profit>=0?'gain':'loss')+'">'+(x.profit>0?'+':'')+fmt(x.profit)+'</b><br><button class="btn ghost small" data-deldeal="'+x.id+'" style="margin-top:6px">Удалить</button></div></div>'}).join(''):'<div class="empty">'+(S.deals.length?'Ничего не найдено.':'Сделок пока нет. Посчитайте сделку и сохраните её.')+'</div>';
+}
+
+['buy','sell','other','comm'].forEach(function(id){$(id).oninput=function(){if(id==='comm'){S.comm=num($('comm').value);save()}calc()}});
+$('carSel').onchange=renderHero;
+var RADMIR='Mitsubithsi Lancer EVO IX|2000000|полный|250|411|Mitsubithsi Lancer EVO IX.jpg;Ford Focus RS|1800000|передний|265|419|Car419.png;BMW X5 E53|1300000|полный|240|475|BMW X5 E53.jpg;Mazda RX-7 Spirit R|1600000|задний|265|477|Mazda RX7 FD3 Spirit.jpg;Ford Raptor F150|2800000|полный|220|495|Ford Raptor F150.jpg;BMW 540i E34|900000|задний|250|507|BMW 525i E34.jpg;Ford Focus 3|720000|передний|202|516|Ford Focus 3(516).jpg;Mercedes E420 W210|1300000|задний|250|540|Mercedes E420 W210.jpg;BMW 540i E39|1300000|задний|250|551|Car551.png;Toyota Supra A80|1600000|задний|250|559|559veh.jpg;Subaru WRX Sti|1800000|полный|250|560|Subaru WRX Sti.jpg;Nissan Skyline ER34|1200000|задний|260|562|Nissan Skyline ER34.jpg;Mercedes S600 W140|1300000|задний|250|585|Car585.png;Volkswagen Golf R|2000000|полный|250|589|Avt589.png;BMW M5 E60|3000000|задний|245|612|BMW M5 E60.png;BMW X6M E71|2600000|полный|250|614|BMW X6M E71(614).jpg;BMW X5M E70|2500000|полный|250|908|Car908.png;Toyota Chaser|1100000|задний|250|15065|Toyota Chaser(15065).jpg;Volkswagen Touareg I|1500000|полный|240|15066|Car15066.png;BMW 750i E38|1400000|задний|250|15067|BMW 750i E38.jpg;Toyota Mark II 90|1050000|задний|250|15068|Toyota Mark II 90.jpg;Toyota Camry V55|1500000|передний|240|15069|Car15069.png;Toyota Altezza|1000000|задний|250|15072|15072veh.jpg;Honda Accord Type S|990000|передний|265|15077|15077.png;Volkswagen Scirocco|1600000|передний|240|15081|Car15081.png;Lexus IS F|2200000|задний|270|15086|Car15086.png;Mazda 3 MPS|750000|передний|240|15087|Car15087.png;Mazda MX-5|1020000|задний|190|15088|Mazda MX-5(15088).jpg;Nissan Silvia S15|1400000|задний|240|15090|15090veh.jpg;Mercedes W124 E500|900000|задний|250|15093|15093veh.jpg;Jeep Grand Cherokee|800000|полный|200|15115|Jeep Grand Cherokee(15115).jpg;Toyota LC Prado 150|2300000|полный|190|15118|Toyota LC Prado 150.jpg;Mitsubithsi EVO X|800000|полный|250|15125|Mitsubithsi EVO X.jpg;Toyota Camry V40|850000|передний|230|15128|Toyota Camry V40.jpg;Subaru Impreza WRX STI|1500000|полный|250|15131|Car15131.png;Mercedes CLS63 AMG C218|4500000|полный|250|15141|Car15141.png;AUDI S3 8V|2100000|полный|250|15144|AUDI S3 8V.jpg;AUDI RS6 C5|1500000|полный|250|15149|AUDI RS6 C5(15149).jpg;Volvo V60|1800000|полный|250|15152|Volvo V60.jpg;AUDI Quattro|2500000|полный|240|587|Car587.png;AUDI Q7 V12 TDI|2500000|полный|250|793|AUDI Q7 V12 TDI.jpg;Mercedes S65 AMG V221|3200000|полный|250|798|Car798.png;Mercedes ML63 AMG W164|2000000|полный|250|1326|Mercedes ML63 AMG W164.jpg;BMW 740 F02|2900000|полный|250|15073|Car15073.png;Volvo XC90|3150000|полный|230|15092|15092.png;Toyota Supra GR A90|6000000|задний|250|15106|Toyota Supra RG A90.jpg;Mercedes X-Class|2500000|полный|210|15147|Mercedes X-Class.jpg;Mercedes C63 W204|3200000|полный|250|15140|Mercedes C63 W204.jpg;Toyota Camry V70|3500000|передний|240|15157|Car15157.png;Toyota Mark II 100|1200000|задний|250|15162|Toyota Mark II 100.jpg;Honda S2000|1600000|задний|270|15163|Honda S2000(15163).jpg;BMW 325i E36|700000|задний|220|15168|15168.png;Honda Civic TypeR FK8|2000000|передний|272|15171|Car15171.png;BMW M3 E46|1300000|задний|250|15180|BMW M3 E46.png;BMW 1M E82|1500000|задний|245|15181|15181veh.jpg;Honda Civic TypeR FN2|900000|передний|265|15183|Car15183.png;Skoda Octavia VRS|2000000|полный|250|15185|Skoda Octavia VRS.png;Nissan 370Z|1800000|задний|250|15191|Nissan 370Z.png;BMW M3 E92|2500000|задний|250|15209|BMW M3 E92.png;Ford Mustang GT V|4000000|задний|270|15219|15219veh.jpg;Alfa Romeo Giulia|4000000|задний|305|15203|Alfa Romeo Giulia.jpg;Toyota LC 100|1600000|полный|175|15240|Toyota Land Cruiser 100.png;Land Rover Defender|4800000|полный|200|15226|Land Rover Defender.png;Chevrolet Suburban|1200000|полный|175|15214|Chevrolet Suburban.png;Jeep Gladiator|6000000|полный|186|15221|Jeep Rubicon.png;Infinity Q50|2800000|задний|250|15220|Infinity Q50.png;Mercedes S320 CDI W220|700000|задний|240|15664|15664veh.jpg;Mercedes GL63 AMG X166|3800000|полный|250|15265|15265.jpg;Nissan 400Z|2500000|задний|250|15271|15271.jpg;Subaru Impreza WRX STI (15273)|1200000|полный|245|15273|15273.jpg;Toyota 4Runner|3000000|полный|180|15274|15274.jpg;Volkswagen Touareg NF|1900000|полный|240|15276|15276veh.jpg;Lexus RC-F|4000000|задний|270|602|602.jpg;Mini JCW GP|1700000|передний|260|699|699.jpg;Toyota Tundra|3500000|полный|180|15275|15275.jpg;Mercedes CLS53 C257|5500000|полный|270|15602|15602.jpg;Hummer H2|3000000|полный|175|15605|Hummer H2.png;KIA K5|3000000|передний|250|15619|KIA K5.png;Mercedes CLS63 AMG S219|3000000|задний|250|15645|Mercedes-Benz CLS 63 W219.png;BMW 330D G20|4000000|задний|250|15651|15651.png;Zeekr 001|3500000|полный|230|15675|Car15675.png;Chevrolet Corvette C6|4500000|задний|295|15677|Chevrolet Corvette C6.jpg;Volkswagen Passat B8|1500000|передний|235|474|Volkswagen Passat B8.jpg;Toyota LC 200 II|4000000|полный|215|15693|Toyota LC 200 II.jpg;Mercedes E63 AMG W211|3800000|задний|250|15280|Mercedes E63 AMG W211.jpg;Nissan 180SX|1200000|задний|240|17412|Nissan 180SX.jpg;Hyundai Santa Fe|700000|полный|230|909|909.jpg;Mercedes E500 W212|4000000|полный|250|15199|Veh15199.jpg;Porshe Panamera 970|5000000|передний|305|15200|Veh15200.jpg;Land Rover RR L322|3000000|полный|220|15201|Veh15201.jpg;Mazda RX-8|1308000|полный|250|17464|Veh17464.jpg;BMW 330i F30|2750000|полный|250|17465|Veh17465.jpg';
+var RADMIR_P='Porshe Cayenne E3|10000000|полный|286|400|Car400.png;Mercedes E63s AMG W212|5000000|полный|250|402|Car402.png;Audi RS-6 C7 Avant|6000000|полный|300|405|405veh.jpg;RollsRoyce Phantom VII|16500000|задний|240|409|Car409.png;Mercedes C63s AMG C205|7000000|задний|280|410|410veh.jpg;Lamborghini Aventador SV|29000000|полный|350|415|Veh415.jpg;Maybach X222|13000000|задний|250|429|Veh429.jpg;Ferrari 488|20000000|полный|330|451|451veh.jpg;BMW G30 540i LCI|6000000|задний|250|466|466veh.jpg;AUDI R8|9000000|полный|330|480|Car480.png;Toyota LC 200 III|7000000|полный|215|489|Car489.png;Land Rover SVA L405|10000000|полный|250|490|Car490.png;Dodge Challenger SRT|5600000|задний|317|494|DodgeCar494.png;RollsRoyce Wraith|20000000|задний|250|502|Car502.png;NISSAN GT-R 35|6800000|полный|320|503|Car503.png;Bentley Bentyaga|15000000|полный|301|505|Bentley Bentyaga.jpg;Porshe 911 / 991|15000000|полный|310|506|Veh506.jpg;Ferrari Portofino|12000000|полный|320|541|Car541.png;Tesla Model S P90D|6500000|полный|250|543|Car543.png;BMW M4 F82 LCI|4500000|задний|270|558|Car558.png;Mercedes G63 6x6 W463 II|18000000|полный|160|573|573veh.jpg;Mercedes G63 W463 II|7000000|полный|230|579|579veh.jpg;Porshe Panamera 971|10000000|полный|306|604|Car604.png;Lamborghini Huracan|22000000|полный|325|605|Car605.png;BMW M2 F87|6300000|задний|270|794|Car794.png;Mercedes G63 AMG 4x4|35000000|полный|220|795|Car795.png;Mercedes G63 AMG W463 III|19000000|полный|240|796|Car796.png;Ford Mustang GT VI F|5500000|задний|250|797|Car797.png;BMW X5M F85|7000000|полный|270|907|BMWCar907.png;Maybach S650 Pullman|25000000|задний|210|965|Car965.png;Lamborghini Urus|25000000|полный|305|999|Car999.png;Lexus LX570|8000000|полный|220|15071|Car15071.png;Jeep GC WK2 Trackhawk|10000000|полный|290|15075|15075car.jpg;Cadilas Escalade K2XL|10000000|полный|180|15076|Car15076.png;Mercedes 560 Sec C126|10000000|задний|295|15082|Car15082.png;Bugatti Chiron|100000000|полный|420|15085|15085veh.jpg;Audi RS-7 C7|5300000|полный|300|15089|Car15089.png;BMW X6M F86|7000000|полный|270|15094|15094veh.jpg;BMW M1 E26|22000000|задний|260|15105|Car15105.png;BMW M5 F90|13000000|полный|290|15107|Car15107.png;BMW X3M F97 LCI|10000000|полный|270|15108|15108veh.jpg;BMW i8 L12 LCI|5500000|полный|260|15109|15109vehu.jpg;Chevrolet Corvette C7|6000000|задний|320|15113|Veh15113.jpg;Mercedes GT63s AMG E|16000000|полный|315|15114|Car15114.png;Mclaren P1|20000000|полный|340|15116|Car15116.png;Mercedes E63s AMG W213|12300000|полный|300|15120|Car15120.png;Tesla Model X|7000000|полный|250|15126|Car15126.png;W Company Fenyr SuperSport|40000000|задний|350|15137|Car15137.png;Mercedes E63s AMG W213 F|14500000|полный|300|15142|MercedesCar15142.png;RollsRoyce Cullinan|55000000|полный|250|15146|Car15146.png;Land Rover Velar|6000000|полный|240|15148|Car15148.png;BMW X7 G07|12000000|полный|250|15153|Car15153.png;BMW M5 F90 LCI|15000000|полный|300|15158|Car15158.png;Acura NSX|15000000|полный|307|15159|Car15159.png;BMW M8 F92|15500000|полный|305|15164|Veh15164.jpg;BMW M4 G82|11000000|задний|290|15165|15165BMW.jpg;Mercedes S63 AMG V222|11000000|полный|265|15166|15166veh.jpg;Mercedes S500 W222|6000000|полный|250|15167|15167veh.jpg;Chevrolet Corvette C8|13500000|задний|320|15169|Veh15169.jpg;Ferrari F40|40000000|задний|324|15170|15170veh.jpg;Lexus LFA|20000000|задний|325|15172|15172veh.jpg;Porsche 911 992|25000000|полный|330|15173|15173veh.jpg;Mercedes SL65 AMG|10000000|задний|320|15178|15178veh.jpg;Ferrari F430|15000000|задний|315|15187|15187veh.jpg;BMW X6M F96|15000000|полный|290|15188|15188veh.jpg;Porsche Taycan Turbo S|13000000|полный|260|15192|Veh15192.jpg;Lamborghini Countach|25000000|полный|294|15225|Lamborghini Countach.png;Porsche 911 Turbo 930|14000000|задний|294|15237|Porsche 911 Turbo 1975.png;BMW M6 F13|4600000|задний|270|15211|Veh15211.jpg;Chevrolet Camaro ZL1|7500000|задний|250|15213|Veh15213.jpg;BMW M635CSI E24|16000000|задний|250|15206|Car15206.png;Pagani Huayra|250000000|задний|380|15236|Pagani Huayra.png;BMW Z8 E52|30000000|задний|250|15212|BMW Z8 E52.png;Lamborghini Aventador SVJ|50000000|полный|350|15224|Veh15224.jpg;DMC 12|4000000|задний|200|15216|Delo.png;BMW M5 F10|4000000|задний|250|15210|Car15210.png;Mercedes AMG GT R|20000000|задний|318|15228|Car15228.png;Dodge Charger SRT|7500000|задний|290|15217|Veh15217.jpg;Citroёn DS 23|13000000|передний|188|15215|Citroёn DS 23.png;Koenigsegg Jesko|120000000|полный|400|15222|Koenigsegg Jesko.png;McLaren Senna|100000000|задний|335|15227|McLaren Senna.png;Ford VelociRaptor|18000000|полный|220|15218|Hennessey VelociRaptor 6x6.png;Audi RS7 C8|11000000|полный|300|15204|Car15204.png;Noble M600|20000000|задний|360|15235|Noble M600.png;Porche 918 Spyder|35000000|полный|345|15230|Porche 918 Spider.jpg;Maybach G650 Laundaulet|70000000|полный|180|15266|15266veh.jpg;Audi RS4 B9 Avant|7000000|полный|280|15246|15246.jpg;Audi RS5 F5|5500000|полный|280|15247|15247.jpg;Audi RSQ8|15000000|полный|300|15248|Audi RSQ8.jpg;BMW X7 G07 LCI|15000000|полный|300|15249|15249.jpg;Bugatti Divo|353000000|полный|380|15250|15250.jpg;Ferrari SF90|75000000|полный|340|15252|15252.jpg;Ford GT|18000000|задний|330|15259|15259.jpg;Lamborghini Centenario|164000000|полный|350|15261|15261.jpg;McLaren 765LT|65000000|задний|330|15263|15263.jpg;Mercedes C63 C204 BS|8000000|задний|300|15264|Mercedes C63 C204 BS.jpg;Mercedes S63 AMG V223|20000000|полный|300|15269|15269.jpg;Mercedes S500 W223|12000000|полный|250|15270|15270.jpg;Audi TT RS|5500000|полный|280|533|533.jpg;Mercedes GLS 63 AMG|18000000|полный|250|15286|Car15286.png;Dodge RAM TRX|15000000|полный|220|15284|15284.jpg;Audi Etron GT|13000000|полный|250|15288|15288.jpg;BMW X5M F95|15000000|полный|290|15289|15289.jpg;Tayota LC 300|12000000|полный|215|15290|15290.jpg;Rolls Royce Phantom VIII|65000000|задний|250|15287|15287.jpg;Ferrari 512 TR|20000000|задний|305|15601|15601.jpg;Porshe 959|14000000|полный|317|15298|15298.jpg;Bugatti Veyron|60000000|полный|407|15611|15611.jpg;BMW M3 F80 CS|9000000|задний|300|15622|15622BMW.jpg;Lamborghini Sian|200000000|полный|350|15626|15626.jpg;Porsche Cayenne E3 Coupe|16000000|полный|300|15628|15628.jpg;Mercedes V Class|15000000|задний|220|15630|15630.jpg;Audi RS6 C8|12000000|полный|300|15637|Veh15637.jpg;Bentley Flying Spur|35000000|полный|330|15640|15640.png;BMW M3 G81|13000000|полный|290|15653|15653.png;BMW 760i G70|20000000|полный|250|15652|15652.png;Mercedes E63s A.W213 Estate|15000000|полный|300|15662|BMWCar15662.png;BMW XM|25000000|полный|270|15666|BMWCar15666.png;BMW M8 GC|17000000|полный|305|15669|Car15669.png;Ferrari 812|35000000|полный|340|15673|Car15673.png;Maybach GLS 600 X167|29000000|полный|250|15678|Maybach GLS 600 X167.jpg;RollsRoyce Cullinan II|62000000|полный|260|15690|RollsRoyce Cullinan II.jpg;Koenigsegg Gemera|125000000|полный|400|15613|15613.jpg;Austin Seven 24|150000000|задний|120|15205|Austin Seven 24.png;Audi S8 D4|6000000|задний|250|17415|Audi S8 D4.jpg;Mercedes GLE63S W166|5500000|задний|270|17416|17416.jpg;Mercedes GLE63s C292|5500000|задний|270|17417|17417.jpg;Mercedes GLE63s W167|12500000|задний|290|17418|17418.jpg;Lamborghini Urus FL|27500000|задний|305|17427|17427.jpg';
+var RADMIR_T='ZIL 130A|1800000||95|406|ZIL 130A.jpg;GAZ NEXT (Тент)|2400000||105|456|G456.png;Mercedes Vito|2800000||109|459|G459.png;GAZ Бизнес|1900000||105|482|482veh.jpg;GAZ 3309|1200000||100|499|499veh.jpg;KAMAZ 53212 K1|3400000||100|514|514veh.jpg;Газель 3302|1200000||114|518|518car.jpg;GAZ 66 «ШИШИГА»|1850000||80|15083|15083veh.jpg;Mercedes Actros|7500000||151|15095|G15095.png;Volvo FH16|10000000||135|15096|Volvo FH16.jpg;KAMAZ 54115|4000000||132|15098|KAMAZ 54115.jpg;Maz 642205|4500000||100|15099|15099veh.jpg;Scania R700|10000000||117|15100|G15100.png;ZIL 133 (тягач)|1800000||69|15101|15101veh.jpg;MAN TGS|6500000||143|15102|G15102.png;ZIL 131|2400000||93|15103|ZIL 131.jpg;Mercedes Unimog|4000000|полный|135|15232|Mercedes Benz UnimogU5023.png;Mercedes Sprinter W906|2500000|полный|180|15268|15268.jpg;DAF XF 105 Fuel|7000000|полный|145|15097|Veh15097.jpg;DAF XF 105|7000000|полный|145|15097-2|Veh403.jpg;KAMAZ К4 Продукты|4500000||110|609|609.png';
+var RADMIR_X='Старая модель УАЗ Hunter|0|задний|85|500|Старая модель УАЗ Hunter.png|Особые;Буханка «Инкассация»|0|полный|110|15117|Буханка «Инкассация»(15117.jpg|Особые;УАЗ 469|0|полный|150|500-2|УАЗ 469.jpg|Особые;Subaru Impreza RS SPORT|0|полный|265|535|Subaru Impreza RS SPORT.png|Контейнер: Китай;Ferrari LaFerrari|0|задний|350|15182|Veh15182.jpg|Контейнер: Дубай;BMW M5 F90 CS|0|полный|300|15175|BMW M5 F90 CS.png|Контейнер: Дубай;Mercedes-Benz SLS AMG|0|задний|320|15176|Mercedes-Benz SLS AMG(15176).jpg|Контейнер: Дубай и США;HUMMER H1|0|полный|190|15177|HUMMER H1(15177).jpg|Контейнер: Дубай, рулетка;Bentley 1928 8 litr|0|задний|163|15179|Asea695.png|Контейнер: Дубай;BMW 850 CSI|0|задний|250|15161|BMW 850 CSI.jpg|Контейнер: Европа;Bentley Turbo R|0|задний|210|15156|Bentley Turbo R.png|Контейнер: Дубай;Mercedes Benz AMG McLaren SLR|0|полный|350|15160|15160veh.jpg|Контейнер: Дубай и Европа;Tesla Cybertruck|0|полный|250|15104|Tesla Cybertruck.png|Контейнер: Дубай;Mercedes-Benz 300 SL|0|задний|220|15091|Mercedes-Benz 300 SL.png|Контейнер: Дубай, рулетка;Lamborghini Aventador J|0|полный|350|15223|Veh15223.jpg|Контейнер: Дубай;Mercedes Benz CLK-GTR|0|задний|335|15229|Mercedes Benz CLK-GTR.png|Контейнер: Дубай, рулетка;Mersedes W124 Coupe AMG|0|задний|305|15155|Mercedes-Benz w124.png|Контейнер: Дубай;Mercedes-Benz 280sl|0|задний|210|15190|Mercedes-Benz 280sl.png|Контейнер: Дубай;Dodge RAM srt|0|полный|250|15189|Dodge RAM srt(15189).jpg|Контейнер: США;Quadra V-Tech|0|полный|350|15238|Quadra V-Tech.png|Контейнер: Дубай;BMW M3 G80 CS|0|задний|307|15636|15636.png|Контейнер: Дубай;GAZ 21 Волга|0|задний|135|15694|GAZ 21 Волга.jpg|Контейнер: Россия;ZAZ 965|0|задний|80|17411|ZAZ 965.png|Контейнер: Почта (Россия);Dodge Challenger R/T|0|задний|210|17414|Dodge Challenger R-T.png|Контейнер: Америка;Mercedes 190E W201 EVO II|0|задний|250|17406|Mercedes 190E W201 EVO I.png|Контейнер: Дубай;Porsche 911/993 GT2|0|задний|301|17419|17419.jpg|Контейнер: Дубай;L460|0|передний|250|17435|17435veh.jpg|Контейнер: Дубай;Bandos Багги|0|полный|170|568|Bandito Багги.png|Крафт;Ford Shelby Cobra 42|0|задний|250|15174|Шелби Кобра.png|Крафт;Napier Railton|0|задний|268|15233|Napier Railton.png|Крафт;ZAZ E-Zaz|0|полный|300|15639|15639.png|Крафт;Chevrolet Camper (Автодом)|0|задний|170|15649|15649.png|Крафт;ZIL 131 Кунг|0|полный|135|15680|ZIL 131 Кунг.jpg|Крафт;Rolls Royce Spectre|0|задний|280|15686|Rolls Royce Spectre.jpg|Крафт;Mercedes Benz SL 63 Mansory|0|полный|330|15685|Mercedes Benz SL 63 Mansory.jpg|Крафт;Lamborghini Revuelto|0|полный|350|15689|Lamborghini Revuelto.jpg|Крафт;GAZ Spooky Bus|0|задний|230|423|GAZ Spooky Bus.jpg|Крафт;BMW M5 G90|0|полный|300|15696|BMW M5 G90.jpg|Крафт;GAZ Volgatti|0|задний|420|17425|17425.jpg|Крафт;Ferrari SF90 XX|0|передний|340|17432|17432veh.jpg|Крафт;Mercedes Brabus Rocket G|0|передний|330|17443|Grand Theft Auto San Andreas Screenshot 2025.12.27 - 19.41.55.95.png|Крафт;Xiaomi Su 7 Ultra G|0|задний|310|17457|Grand Theft Auto San Andreas Screenshot 2026.10.03 - 05.58.42.84.png|Крафт;Toyota Yaris GR Varis|0|передний|250|17455|Grand Theft Auto San Andreas Screenshot 2026.10.03 - 06.00.18.46.png|Крафт;Zeekr 009 Mansory|0|задний|275|17459|Grand Theft Auto San Andreas Screenshot 2026.10.03 - 05.59.48.68.png|Крафт;Mercedes-Benz W126|0|передний|160|529|Mercedes-Benz S-class W126.png|Рулетка;Ford Mustang 1967|0|задний|215|15293|Ford Mustang 1967.jpg|Кейс;Ford Hot Rod|0|полный|250|15295|15295.png|Кейс;Mercedes Benz G63 P900 ROCKET Halloween Edition|0|полный|300|15294|15294.png|Кейс;Bentley UltraTank|0|гусеничный|80|15616|15616new.png|Кейс;International ProStar LT|0|задний|143|15618|15618.png|Кейс;ВОЛГА КГБ|0|задний|150|15604|15604.png|Кейс;Rolls-Royce Cullinan Bunker|0|полный|250|15282|15282.png|Кейс;Rolls-Royce Phantom VIII Bunker|0|задний|250|15283|15283.png|Кейс;Ferrari Enzo|0|задний|348|15624|15624.png|Кейс;Mercedes EQG|0|передний|210|15627|15627veh.jpg|Кейс;Mercedes-Benz Puch|0|полный|170|15634|15634.png|Кейс;УАЗ-452 Пикап|0|полный|220|15635|15635.png|Кейс;БРДМ Охотник|0|полный|170|444|444.png|Кейс;GMC Hummer EV|0|полный|300|15647|15647.png|Кейс;Lamborghini Tecnomar (Яхта)|0||100|15646|15646.png|Кейс;Lamborghini Diablo|0|полный|294|15650|15650.png|Кейс;Chopper Skeleton|0|задний|250|15657|Chopper Skeleton.png|Кейс;Phantom VII H|0|полный|260|15658|Phantom VII H.png|Кейс;Phantom VII P|0|полный|260|15659|Phantom VII P.png|Кейс;Tesla Semi|0|полный|190|15665|Tesla Semi.png|Кейс;ЗИЛ 131 600 сил|0|полный|220|15681|ЗИЛ 131 600 сил.jpg|Кейс;Porsche 911 Mansory|0|полный|340|15682|Porsche 911 Mansory.jpg|Кейс;Mercedes Benz Brabus Kart|0|полный|90|571|Mercedes Benz Brabus Kart.jpg|Кейс;Mercedes Benz Iseki 26|0|задний|75|572|Mercedes Benz Iseki 26.jpg|Кейс;Mercedes Benz XLP 900 6x6|0|полный|220|557|Mercedes Benz XLP 900 6x6.jpg|Кейс;BMW G99|0|полный|305|15697|15697veh.jpg|Кейс;ИЖ педальный|0||90|15699|ИЖ педальный.jpg|Кейс;Ferrari Purosangue|0||310|17407|Ferrari Purosangue.png|Кейс;Peterbilt 389|0||160|515|515veh.jpg|Кейс;L460 Bunker|0|передний|280|17436|17436veh.jpg|Кейс;Bell 430|0||250|17440|17440veh.jpg|Кейс;Cadilac Escalade V T1XX|0|полный|280|17446|Grand Theft Auto San Andreas Screenshot 2025.12.27 - 20.20.17.24.png|Кейс;Mercedes Benz Brabus P900 Rocket|0|полный|300|15297|15297.png|Донат;Гоночный ВАЗ 2101|0|полный|250|15617|15617.png|Донат;Bentley Continental|0|полный|336|15623|15623.png|Донат;BMW M4 CSL|0|задний|307|15633|15633.png|Донат;Mercedes-AMG Project One|0|полный|400|15643|15643.png|Донат;Honda NSX GP|0|задний|290|504|Honda NSX GP.jpg|Донат;MB Brabus Crawler|0|полный|315|556|MB Brabus Crawler.jpg|Донат;Mercedes Maybach Vision 6|0|задний|280|15679|Mercedes Maybach Vision 6.jpg|Донат;GAZ 21 Volga Coupe V12|0|задний|275|15691|GAZ 21 Volga Coupe V12.jpg|Донат;Koenigsegg Agera RS|0|полный|420|17401|Koenigsegg Agera RS.jpg|Донат;Audi R8 Titan|0|задний|300|17404|Audi R8 Titan.png|Донат;M4 GT3 G82|0|передний|330|17433|17433veh.jpg|Донат;Lamborghini Murcielago|0|передний|264|17434|17434veh.jpg|Донат;Ford GT MK II|0|задний|335|17444|Grand Theft Auto San Andreas Screenshot 2025.12.27 - 20.23.17.14.png|Донат;ГАЗ-82 «ТАЙГА»|0|полный|235|15612|15612new.png|Пропуск;Snow Snow|0|полный|50|15615|15615new.png|Пропуск;LC300 Safari|0|полный|200|15632|15632.png|Пропуск;UAZ-452 Concept|0|полный|220|15631|15631.png|Пропуск;ZAZ Project 965|0|полный|300|15638|15638.png|Пропуск;Lamborghini Urus Mansory Travis edition|0|полный|326|15642|15642.png|Пропуск;Toyota Supra A90 H|0|задний|250|15656|Toyota Supra A90 H.jpg|Пропуск;Lamborghini Huracan Sterrato|0|полный|305|15660|Lamborghini Huracan Sterrato.jpg|Пропуск;Mercedes Benz SL 63|0|полный|305|15684|Mercedes Benz SL 63.jpg|Пропуск;BMW M2 G87|0|задний|285|15676|BMW M2 G87.jpg|Пропуск;GAZ School Bus|0|задний|215|15692|GAZ School Bus.jpg|Пропуск;Велосипед с гробиком|0||50|17402|Велосипед с гробиком.jpg|Пропуск;Dodge Challenger|0|задний|325|17400|Dodge Challenger.jpg|Пропуск;Ford GT40|0|задний|170|17413|Ford GT40.png|Пропуск;Aston Martin Victor|0|задний|330|17408|Aston Martin Victor.png|Пропуск;KAMAZ Hooligun|0|задний|220|17420|17420car.jpg|Пропуск;LADA 2106 Hooligan|0|задний|250|17421|17421car.jpg|Пропуск;BMW M6 E64 Cabrio|0|задний|270|17424|17424.jpg|Пропуск;Porsche 911/993 RWB|0|задний|301|17426|17426car.jpg|Пропуск;Viper ZB2|0|полный|320|17437|17437veh.jpg|Пропуск;Continental GT III|0|полный|250|17439|17439veh.jpg|Пропуск;Mitsubishi Lancer EVO IX W|0|задний|265|17441|Grand Theft Auto San Andreas Screenshot 2025.12.27 - 19.59.13.89.png|Пропуск;Ferrari 12 Cilindri|0|задний|340|17442|Grand Theft Auto San Andreas Screenshot 2025.12.27 - 19.59.37.75.png|Пропуск;Lamborghini Fenomeno|0|задний|350|17449|Grand Theft Auto San Andreas Screenshot 2026.03.11 - 07.03.08.03.png|Пропуск;Xiaomi Su 7|0|задний|230|17456|Grand Theft Auto San Andreas Screenshot 2026.10.03 - 05.44.17.89.png|Пропуск;Zeekr 009|0|задний|250|17458|Grand Theft Auto San Andreas Screenshot 2026.10.03 - 05.45.10.06.png|Пропуск;УАЗ 469 Разбойник|0|полный|250|15195|Grand Theft Auto San Andreas Screenshot 2026.04.13 - 20.16.48.13.png|Лавка обмена;Bugatti Mistral|0|полный|420|15661|Bugatti Mistral.jpg|Лавка обмена;BMW M4 G82 Camper|0|полный|290|15668|BMW M4 G82 Camper.jpg|Лавка обмена;Porsche Gamballa Marsien|0|полный|330|15688|Porsche Gamballa Marsien.jpg|Лавка обмена;Lixiang Li9|0|полный|220|15695|15695veh.jpg|Лавка обмена;GAZ 24-95 Кочевник|0|задний|250|17405|GAZ 24-95 Кочевник.png|Лавка обмена;Lamborghini Aventador Pickup|0|задний|325|17409|Lamborghini Aventador Pickup.png|Лавка обмена;Impala|0|полный|200|17438|17438veh.jpg|Лавка обмена;Mercedes G-EVO|0|полный|250|17445|Grand Theft Auto San Andreas Screenshot 2025.12.27 - 19.52.59.55.png|Лавка обмена;Ford Mustang GT 2024|0|полный|265|17452|17452veh.jpg|Лавка обмена;Ваз 21099|0|полный|180|17462|Veh17462.jpg|Лавка обмена;BMW X5 E53 (17463)|0|полный|265|17463|Veh17463.jpg|Лавка обмена';
+$('presetBtn').onclick=function(){var add=0,upd=0;[[RADMIR,'Средний'],[RADMIR_P,'Премиум'],[RADMIR_T,'Грузовой'],[RADMIR_X,'Эксклюзив']].forEach(function(pk){pk[0].split(';').forEach(function(l){var a=l.split('|'),rid=a[4],ex=S.cars.find(function(c){return c.rid===rid}),o={name:a[0],price:+a[1],drive:a[2],speed:+a[3],rid:rid,file:a[5],src:a[6]||'',cls:pk[1]};if(ex){Object.assign(ex,o);upd++}else{o.id=uid();o.photo='';S.cars.push(o);add++}})});var ok=save();renderCars();$('presetMsg').textContent=(ok?'':'Не удалось сохранить: мало места в браузере. ')+'Добавлено машин: '+add+', обновлено: '+upd+'.'};
+$('bulkBtn').onclick=function(){$('bulkFile').click()};
+$('bulkFile').onchange=function(){var inp=this,fs=[].slice.call(inp.files),ok=0,miss=[],i=0;if(!fs.length)return;$('presetMsg').textContent='Обрабатываю фото…';
+ function norm(s){return s.toLowerCase().replace(/\.[a-z0-9]+$/,'').replace(/[^a-zа-я0-9]/g,'')}
+ function match(f){var fn=f.name;try{fn=decodeURIComponent(fn)}catch(e){}fn=fn.toLowerCase().replace(/^\d+px-/,'').replace(/_/g,' ');var nn=norm(fn),nums=fn.match(/\d+/g)||[];return S.cars.find(function(c){return c.file&&c.file.toLowerCase()===fn})||S.cars.find(function(c){return c.rid&&nums.indexOf(c.rid)>=0})||S.cars.find(function(c){var cn=norm(c.name);return cn&&(nn===cn||nn.indexOf(cn)>=0)})}
+ function next(){if(i>=fs.length){var sv=save();renderCars();inp.value='';$('presetMsg').textContent='Фото привязано: '+ok+' из '+fs.length+'.'+(miss.length?' Не нашёл машину для: '+miss.slice(0,8).join(', ')+(miss.length>8?' и ещё '+(miss.length-8):'')+'.':'')+(sv?'':' Внимание: не хватило места в браузере, часть фото не сохранилась.');return}var f=fs[i++],c=match(f);if(!c){miss.push(f.name);next();return}shrink(f,function(p){if(p){c.photo=p;ok++}next()},420)}
+ next()};
+$('q').oninput=renderLog;$('flt').onchange=renderLog;$('cq').oninput=renderCars;$('clsF').onchange=renderCars;
+$('mkAdd').onclick=function(){var c=curCar(),p=num($('mkP').value);if(!c||!p){$('mkP').focus();return}S.market=S.market||[];S.market.push({id:uid(),cid:c.id,car:c.name,price:p,ts:Date.now()});if(S.market.length>3000)S.market.shift();save();$('mkP').value='';renderAdvice()};
+$('mkP').onkeydown=function(e){if(e.key==='Enter')$('mkAdd').click()};
+function setGoal(){var a=num($('goalA').value);S.goal=a?{amount:a,period:$('goalP').value}:null;save();renderGoal()}
+$('goalA').oninput=setGoal;$('goalP').onchange=setGoal;
+function dealTime(x){if(x.t1)return x.t1;var p=String(x.date||'').split('.');return p.length===3?new Date(+p[2],+p[1]-1,+p[0]).getTime():0}
+function renderGoal(){var b=$('goalBox'),g=S.goal;if(!g||!g.amount){b.hidden=true;return}b.hidden=false;var d=new Date();d.setHours(0,0,0,0);if(g.period==='week')d.setDate(d.getDate()-((d.getDay()+6)%7));var st=d.getTime(),earned=S.deals.reduce(function(s,x){return s+(!x.open&&dealTime(x)>=st?x.profit:0)},0),pct=Math.max(0,Math.min(100,earned/g.amount*100));var fresh=!b.dataset.init;if(fresh){b.innerHTML='<div class="gtop"><span id="gLbl"></span><span id="gVal"></span></div><div class="track"><span class="flag" aria-hidden="true">🏁</span><div class="gcar" id="gCar">'+document.querySelector('.head > svg').outerHTML+'</div></div><div class="bar" id="gBar" role="progressbar" aria-label="Прогресс цели" aria-valuemin="0" aria-valuemax="100"><i id="gFill"></i></div><div class="gdone" id="gDone" hidden>Цель выполнена!</div>';b.dataset.init='1'}
+ $('gLbl').textContent='Цель на '+(g.period==='week'?'неделю':'сегодня');$('gVal').textContent=fmt(earned)+' / '+fmt(g.amount);$('gBar').setAttribute('aria-valuenow',Math.round(pct));$('gDone').hidden=earned<g.amount;
+ var car=$('gCar'),pos='calc((100% - 80px) * '+(pct/100).toFixed(4)+')';if(car.dataset.pos!==pos){car.classList.remove('moving');void car.offsetWidth;car.classList.add('moving');car.dataset.pos=pos}
+ requestAnimationFrame(function(){car.style.left=pos;$('gFill').style.width=pct+'%'})}
+function held(x){if(!x.t0)return '';var dd=Math.floor(((x.open?Date.now():x.t1)-x.t0)/864e5);return x.open?' · в процессе '+(dd?dd+' дн.':'меньше дня'):(dd?' · продано за '+dd+' дн.':' · продано в тот же день')}
+function noteIn(x){return '<input class="note" data-note="'+x.id+'" value="'+esc(x.note||'').replace(/"/g,'&quot;')+'" placeholder="Заметка: у кого купил, где продал…" aria-label="Заметка к сделке">'}
+$('expBtn').onclick=function(){$('bk').value=JSON.stringify({app:'flipcalc',v:1,data:S});$('bkMsg').textContent='Копия готова. Нажмите «Скопировать» и сохраните текст в надёжное место.';try{var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([$('bk').value],{type:'application/json'}));a.download='flip-backup.json';document.body.appendChild(a);a.click();a.remove()}catch(e){}};
+$('copyBtn').onclick=function(){var t=$('bk'),ok=false;if(!t.value){$('bkMsg').textContent='Сначала нажмите «Сделать копию».';return}t.select();try{ok=document.execCommand('copy')}catch(e){}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t.value).then(function(){$('bkMsg').textContent='Скопировано.'},function(){$('bkMsg').textContent=ok?'Скопировано.':'Не получилось скопировать автоматически. Выделите текст и скопируйте вручную.'})}else{$('bkMsg').textContent=ok?'Скопировано.':'Выделите текст и скопируйте вручную.'}};
+function restore(txt){try{var o=JSON.parse(txt),d=o&&o.data?o.data:o;if(!d||!Array.isArray(d.cars)||!Array.isArray(d.deals)||!Array.isArray(d.tunes))throw 0;if(!confirm('Заменить текущие данные данными из копии?'))return;S={cars:d.cars,tunes:d.tunes,deals:d.deals,comm:num(d.comm),market:d.market||[],goal:d.goal||null,margin:d.margin};checked={};$('bkMsg').textContent=save()?'Данные восстановлены.':'Данные загружены, но не сохранились: в браузере мало места.';$('comm').value=S.comm||'';renderCars();renderTunes();calc();renderLog()}catch(e){$('bkMsg').textContent='Не получилось прочитать копию. Проверьте, что текст скопирован целиком.'}}
+$('impBtn').onclick=function(){restore($('bk').value)};
+$('impFileBtn').onclick=function(){$('impFile').click()};
+$('impFile').onchange=function(){var f=this.files[0];if(!f)return;var fr=new FileReader();fr.onload=function(){restore(fr.result)};fr.readAsText(f);this.value=''};
+$('tuneList').onchange=function(e){var id=e.target.dataset.t;if(id){checked[id]=e.target.checked;calc()}};
+
+$('saveDeal').onclick=function(){
+ var c=curCar(),r=calc(),m=$('saveMsg');
+ if(!c){m.textContent='Выберите машину. Если списка нет, добавьте её во вкладке «База».';return}
+ if(!r.buy){m.textContent='Введите, за сколько купили машину.';return}
+ var names=S.tunes.filter(function(t){return checked[t.id]}).map(function(t){return t.name}).join(', ');
+ var open=!r.sell,tn=Date.now();S.deals.push({id:uid(),t0:tn,t1:open?0:tn,note:$('dNote').value.trim(),cid:c.id,salon:c.price||0,car:c.name,photo:c.photo||'',date:new Date().toLocaleDateString('ru-RU'),tunes:names,buy:r.buy,sell:r.sell,cost:r.cost,profit:open?0:r.profit,open:open});
+ $('dNote').value='';m.textContent=save()?(open?'Машина добавлена в журнал «в процессе». Когда продадите, впишите цену во вкладке «Журнал».':'Сделка сохранена в журнал.'):'Не удалось сохранить: в браузере нет места или хранилище отключено.';renderLog();
+};
+$('resetForm').onclick=function(){['buy','sell','other','dNote'].forEach(function(i){$(i).value=''});checked={};renderTunes();calc();$('saveMsg').textContent=''};
+
+function shrink(file,cb,mx){
+ var fr=new FileReader();
+ fr.onload=function(){var im=new Image();im.onload=function(){var k=Math.min(1,(mx||640)/Math.max(im.width,im.height)),cv=document.createElement('canvas');cv.width=Math.round(im.width*k);cv.height=Math.round(im.height*k);cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);cb(cv.toDataURL('image/jpeg',0.75))};im.onerror=function(){cb('')};im.src=fr.result};
+ fr.onerror=function(){cb('')};fr.readAsDataURL(file);
+}
+$('addCar').onclick=function(){
+ var name=$('newCar').value.trim();if(!name){$('newCar').focus();return}
+ var f=$('newPhoto').files[0];
+ function done(p){S.cars.push({id:uid(),name:name,photo:p||''});save();$('newCar').value='';$('newPhoto').value='';renderCars()}
+ f?shrink(f,done):done('');
+};
+$('addTune').onclick=function(){
+ var n=$('newTune').value.trim();if(!n){$('newTune').focus();return}
+ S.tunes.push({id:uid(),name:n,cost:num($('newTuneCost').value)});save();$('newTune').value='';$('newTuneCost').value='';renderTunes();calc();
+};
+document.addEventListener('click',function(e){
+ var d=e.target.dataset;
+ if(d.delcar){S.cars=S.cars.filter(function(c){return c.id!==d.delcar});save();renderCars()}
+ if(d.deltune){S.tunes=S.tunes.filter(function(t){return t.id!==d.deltune});delete checked[d.deltune];save();renderTunes();calc()}
+ if(d.mkclear){var mc=S.cars.find(function(z){return z.id===d.mkclear});S.market=(S.market||[]).filter(function(r){return r.cid!==d.mkclear&&!(mc&&r.car===mc.name)});save();renderAdvice()}
+ if(d.fillbuy){$('buy').value=d.fillbuy;calc()}
+ if(d.fillsell){$('sell').value=d.fillsell;calc()}
+ if(d.deldeal){S.deals=S.deals.filter(function(x){return x.id!==d.deldeal});save();renderLog()}
+ if(d.closedeal){var x=S.deals.find(function(z){return z.id===d.closedeal}),inp=document.querySelector('[data-sellfor="'+d.closedeal+'"]'),v=num(inp&&inp.value);if(x&&v>0){x.sell=v;x.profit=v*(1-num(S.comm)/100)-(x.cost||x.buy);x.open=false;x.t1=Date.now();x.date=new Date().toLocaleDateString('ru-RU');save();renderLog()}else if(inp)inp.focus()}
+});
+document.addEventListener('change',function(e){
+ var nt=e.target.dataset.note;if(nt){var nd=S.deals.find(function(z){return z.id===nt});if(nd){nd.note=e.target.value.trim();save()}return}
+ var id=e.target.dataset.cost;
+ if(id){var t=S.tunes.find(function(x){return x.id===id});if(t){t.cost=num(e.target.value);save();renderTunes();calc()}}
+});
+$('wipe').onclick=function(){
+ if(confirm('Стереть все машины, тюнинг и журнал сделок? Это нельзя отменить.')){S={cars:[],tunes:[],deals:[],comm:0};checked={};save();$('comm').value='';renderCars();renderTunes();calc();renderLog()}
+};
+
+load();$('comm').value=S.comm||'';$('marg').value=S.margin!=null?S.margin:10;$('goalA').value=S.goal&&S.goal.amount?S.goal.amount:'';$('goalP').value=S.goal&&S.goal.period||'day';$('marg').oninput=function(){S.margin=num(this.value);save();renderAdvice()};renderCars();renderTunes();calc();renderLog();openPhotos();
+(function(){if(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)return;var t=false;window.addEventListener('scroll',function(){if(t)return;t=true;requestAnimationFrame(function(){document.documentElement.style.setProperty('--sy',window.scrollY);t=false})},{passive:true})})();
+(function(){
+var cv=$('sky'),cx=cv.getContext('2d'),W=0,H=0,P=[],mouse={x:-9999,y:-9999,on:false},col={a:'#5b92ff',i:'#eaeef4'};
+var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
+function colors(){var cs=getComputedStyle(document.documentElement);col.a=cs.getPropertyValue('--accent').trim()||col.a;col.i=cs.getPropertyValue('--ink').trim()||col.i}
+function mk(x,y,g){return{hx:x,hy:y,x:x,y:y,vx:0,vy:0,r:g>=0?1:Math.random()*1.4+.6,z:g>=0?1:Math.random()*.8+.4,ph:Math.random()*6.28,c:Math.random()<.6?0:1,g:g}}
+function init(){var dpr=Math.min(window.devicePixelRatio||1,2);W=window.innerWidth;H=window.innerHeight;cv.width=W*dpr;cv.height=H*dpr;cx.setTransform(dpr,0,0,dpr,0,0);
+ P=[];E=[];var k,q,cnt=0,n=Math.round(Math.min(260,Math.max(90,W*H/5200)));
+ var bodies=[{t:[[2,22],[2,14],[10,11],[32,4],[60,4],[78,11],[95,13],[99,18],[98,22]],w:[22,78]},{t:[[2,22],[3,16],[14,13],[40,6],[56,4],[72,8],[92,14],[99,17],[98,22]],w:[22,78]},{t:[[2,22],[2,8],[10,5],[20,3],[72,3],[84,10],[96,14],[99,18],[98,22]],w:[22,78]},{t:[[2,22],[2,10],[40,10],[44,3],[66,2],[78,10],[96,13],[99,18],[98,22]],w:[20,80]}];
+ var nc=Math.max(2,Math.round(W*H/150000)),boxes=[],tries=0;
+ while(boxes.length<nc&&tries<80){tries++;
+  var sc=W<600?1:1.2+Math.random()*.6,w=100*sc,h=32*sc,ox=Math.random()*Math.max(1,W-w-20)+10,oy=Math.random()*Math.max(1,H*.7-h)+20;
+  if(boxes.some(function(b){return ox<b.x+b.w+30&&ox+w+30>b.x&&oy<b.y+b.h+30&&oy+h+30>b.y}))continue;
+  boxes.push({x:ox,y:oy,w:w,h:h});var g=boxes.length-1,bd=bodies[Math.floor(Math.random()*bodies.length)],fl=Math.random()<.5,base=P.length;
+  var X=function(v){return fl?100-v:v};bd.t.forEach(function(pt){P.push(mk(ox+X(pt[0])*sc,oy+pt[1]*sc,g))});
+  for(q=0;q<bd.t.length-1;q++)E.push([base+q,base+q+1]);
+  var arcs=bd.w.map(function(wx){var s=P.length,m,an;for(m=0;m<5;m++){an=Math.PI-m*Math.PI/4;P.push(mk(ox+X(wx+7.5*Math.cos(an))*sc,oy+(22-7.5*Math.sin(an))*sc,g))}for(m=0;m<4;m++)E.push([s+m,s+m+1]);var c=P.length;for(m=0;m<6;m++){an=m*Math.PI/3;P.push(mk(ox+X(wx+4.5*Math.cos(an))*sc,oy+(22+4.5*Math.sin(an))*sc,g))}for(m=0;m<6;m++)E.push([c+m,c+(m+1)%6]);P.push(mk(ox+X(wx)*sc,oy+22*sc,g));return [s,s+4]});
+  E.push([base,arcs[0][0]],[arcs[0][1],arcs[1][0]],[arcs[1][1],base+bd.t.length-1]);
+ }
+ var tr=0;while(cnt<n&&tr<n*8){tr++;var sx=Math.random()*W,sy=Math.random()*H*.85;if(boxes.some(function(b){return sx>b.x-14&&sx<b.x+b.w+14&&sy>b.y-14&&sy<b.y+b.h+14}))continue;P.push(mk(sx,sy,-1));cnt++}
+}
+function frame(t){
+ cx.clearRect(0,0,W,H);
+ var R=150,i,j,p,a,b,dx,dy,d,f;
+ for(i=0;i<P.length;i++){p=P[i];
+  var tx=p.hx+Math.sin(t/4000+p.ph)*6*p.z,ty=p.hy+Math.cos(t/5000+p.ph)*6*p.z;
+  p.vx+=(tx-p.x)*.012;p.vy+=(ty-p.y)*.012;
+  if(mouse.on){dx=p.x-mouse.x;dy=p.y-mouse.y;d=Math.sqrt(dx*dx+dy*dy);if(d<R&&d>.1){f=(1-d/R)*1.6*p.z;p.vx+=dx/d*f;p.vy+=dy/d*f}}
+  p.vx*=.9;p.vy*=.9;p.x+=p.vx;p.y+=p.vy}
+ cx.lineWidth=.7;cx.strokeStyle=col.a;
+ for(i=0;i<P.length;i++){a=P[i];if(a.g>=0)continue;for(j=i+1;j<P.length;j++){b=P[j];if(b.g>=0)continue;dx=a.x-b.x;dy=a.y-b.y;d=dx*dx+dy*dy;if(d<9600){cx.globalAlpha=(1-d/9600)*.22;cx.beginPath();cx.moveTo(a.x,a.y);cx.lineTo(b.x,b.y);cx.stroke()}}}
+ cx.globalAlpha=.16;cx.lineWidth=.8;cx.strokeStyle=col.a;cx.beginPath();
+ for(i=0;i<E.length;i++){a=P[E[i][0]];b=P[E[i][1]];cx.moveTo(a.x,a.y);cx.lineTo(b.x,b.y)}
+ cx.stroke();
+ for(i=0;i<P.length;i++){p=P[i];cx.globalAlpha=p.g>=0?.45:Math.max(.1,.4+.3*Math.sin(t/900+p.ph));cx.fillStyle=p.g>=0||p.c?col.i:col.a;cx.beginPath();cx.arc(p.x,p.y,p.r*p.z+.3,0,6.283);cx.fill()}
+ if(!reduce&&t>nextSh&&SH.length<5){var dir=Math.random()<.75?1:-1,z=.5+Math.random()*.7,sp=(6+Math.random()*7)*z;SH.push({x:dir>0?Math.random()*W*.7:W*.3+Math.random()*W*.7,y:Math.random()*H*.5,vx:sp*dir,vy:sp*(.25+Math.random()*.3),l:1,z:z,len:6+Math.random()*8});nextSh=t+900+Math.random()*2600}
+ for(i=SH.length-1;i>=0;i--){var s=SH[i],x2=s.x-s.vx*s.len,y2=s.y-s.vy*s.len,gr=cx.createLinearGradient(s.x,s.y,x2,y2);gr.addColorStop(0,col.i);gr.addColorStop(1,'transparent');cx.globalAlpha=s.l*.85*s.z;cx.strokeStyle=gr;cx.lineWidth=1.8*s.z;cx.beginPath();cx.moveTo(s.x,s.y);cx.lineTo(x2,y2);cx.stroke();cx.fillStyle=col.i;cx.beginPath();cx.arc(s.x,s.y,1.4*s.z,0,6.283);cx.fill();s.x+=s.vx;s.y+=s.vy;s.l-=.011;if(s.l<=0||s.x>W+50||s.x<-50||s.y>H)SH.splice(i,1)}
+ cx.globalAlpha=1;
+ if(!reduce)requestAnimationFrame(frame)
+}
+var SH=[],nextSh=1500,E=[];colors();init();
+if(!reduce){
+ window.addEventListener('pointermove',function(e){mouse.x=e.clientX;mouse.y=e.clientY;mouse.on=true;document.documentElement.style.setProperty('--mx',((e.clientX/W-.5)*2).toFixed(3))},{passive:true});
+ window.addEventListener('pointerup',function(e){if(e.pointerType==='touch')mouse.on=false});
+ window.addEventListener('pointercancel',function(){mouse.on=false});
+ document.documentElement.addEventListener('pointerleave',function(){mouse.on=false});
+}
+var rt;window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(function(){init();if(reduce)frame(0)},150)});
+try{matchMedia('(prefers-color-scheme:dark)').addEventListener('change',function(){colors();if(reduce)frame(0)})}catch(e){}
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
